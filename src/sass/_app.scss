@@ -1,0 +1,32 @@
+:root {
+  --secondary-color: hsla(165, 30%, 40%, 0.9);
+  --secondary-color-fade-1: hsl(165, 30%, 40%);
+  --secondary-color-fade-2: hsla(165, 30%, 40%, 0.502);
+  --secondary-color-fade-3: hsla(165, 30%, 40%, 0.847);
+  --neutral-color: hsl(0, 0%, 100%);
+  --neutral-color-fade-1: hsla(0, 0%, 100%, 0.9);
+  --neutral-color-fade-2: hsla(0, 0%, 100%, 0.502);
+  --neutral-color-fade-3: hsla(0, 0%, 100%, 0.751);
+  font-size: 10px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: sans-serif;
+}
+
+body::-webkit-scrollbar {
+  width: 0.9rem;
+}
+body::-webkit-scrollbar-track {
+  background: var(--secondary-color-fade-2);
+}
+body::-webkit-scrollbar-thumb {
+  background: var(--neutral-color);
+  border-radius: 1rem;
+}

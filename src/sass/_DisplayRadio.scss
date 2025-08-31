@@ -1,0 +1,248 @@
+.container-display-radio {
+  height: 100%;
+
+  .display_radios.loaded {
+    width: 100vw;
+    opacity: 1;
+    transition: opacity 1s;
+    overflow: auto;
+    height: calc(71% + 8px);
+    padding-top: 80px;
+    position: absolute;
+    z-index: 50;
+  }
+}
+
+.display_radios.loaded::-webkit-scrollbar {
+  width: 10px;
+}
+
+.display_radios.loaded::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: var(--secondary-color);
+}
+
+.display_radios {
+  display: flex;
+  height: 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  row-gap: 30px;
+  justify-content: space-around;
+  opacity: 0;
+
+  .space4 {
+    width: 300px;
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    animation: appear 0.3s ease-in-out forwards;
+
+    @keyframes appear {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+  }
+
+  .radio {
+    background-color: hsla(46, 89%, 82%, 0.647);
+    width: 95%;
+    height: 95%;
+    border: 1px solid rgba(0, 0, 0, 0.93);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    backdrop-filter: blur(3px);
+    box-shadow:
+      6px 6px 12px #fae7a75b,
+      -6px -6px 12px #fae7a75b;
+    cursor: pointer;
+    transition:
+      background-color 1s,
+      width 0.1s,
+      height 0.1s;
+
+    &:hover {
+      background-color: hsla(45, 69%, 90%, 0.737);
+      width: 97%;
+      height: 97%;
+    }
+  }
+
+  button:active {
+    color: #666;
+    box-shadow:
+      inset 4px 4px 12px #fae7a75b,
+      inset -4px -4px 12px #fae7a75b;
+  }
+
+  .rond {
+    width: 20em;
+    height: 20em;
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    border-radius: 50%;
+
+    p {
+      font-family: "Montserrat", sans-serif;
+      font-weight: bold;
+      width: 80%;
+      text-align: center;
+      word-wrap: break-word;
+      font-size: 14px;
+    }
+
+    .favicon {
+      width: 70px;
+    }
+
+    .favorite {
+      position: absolute;
+      transform: translate(200%, -200%);
+      z-index: 1;
+      background: none;
+      border: none;
+      img {
+        height: 35px;
+        width: 35px;
+      }
+    }
+  }
+
+  .no-results {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    font-family: "Montserrat", sans-serif;
+    font-weight: bold;
+    font-size: calc(1rem * 10);
+    color: var(--neutral-color);
+    background-color: var(--secondary-color);
+    border-radius: 1rem;
+    padding: calc(1rem * 3);
+  }
+}
+
+@media screen and (min-width: 2047px) {
+  .container-display-radio {
+    .display_radios.loaded {
+      width: 100vw;
+      height: 72.2%;
+    }
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .container-display-radio {
+    .display_radios {
+      .rond {
+        height: 17em;
+        width: 17em;
+
+        p {
+          font-size: 13px;
+        }
+        .favicon {
+          width: 50px;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .container-display-radio {
+    .display_radios.loaded {
+      width: 100vw;
+    }
+    .display_radios {
+      .space4 {
+        width: 20%;
+        height: 30%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .rond {
+        height: 12em;
+        width: 12em;
+
+        p {
+          font-size: 9px;
+        }
+        .favicon {
+          width: 40px;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 426px) {
+  .container-display-radio {
+    flex: 1;
+    .display_radios.loaded {
+      height: calc(71% + 8px);
+      width: 100vw;
+    }
+    .display_radios {
+      .space4 {
+        width: 50%;
+        height: 50%;
+        display: flex;
+        justify-content: center;
+      }
+      .rond {
+        height: 15em;
+        width: 15em;
+
+        p {
+          font-size: 9px;
+        }
+        .favicon {
+          width: 40px;
+        }
+      }
+    }
+  }
+
+  @media screen and (max-width: 375px) {
+    .container-display-radio {
+      .display_radios.loaded {
+        height: calc(71% + 6px);
+        width: 100%;
+      }
+      .display_radios {
+        .space4 {
+          width: 50%;
+          height: 50%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+        .rond {
+          height: 15em;
+          width: 15em;
+
+          p {
+            font-size: 9px;
+          }
+          .favicon {
+            width: 40px;
+          }
+        }
+      }
+    }
+  }
+}

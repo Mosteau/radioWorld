@@ -1,0 +1,17 @@
+.clock {
+  width: 120px;
+  overflow: hidden;
+}
+
+.clock .clockh1 {
+  border: 2px solid burlywood;
+  border-radius: 15px;
+  padding: 10px 10px;
+  background-color: cornsilk;
+}
+
+.clockh1 {
+  font-family: "Courier New", Courier, monospace;
+  color: rgb(0, 0, 0);
+  align-items: center;
+}

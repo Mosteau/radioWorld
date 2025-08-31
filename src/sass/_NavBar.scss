@@ -1,0 +1,167 @@
+.navbar {
+  display: flex;
+  height: 14%;
+  justify-content: space-around;
+  align-items: center;
+  background-color: #c34e3a;
+  box-shadow: 0px 8px 1px rgba(0, 0, 0, 0.232);
+  margin-bottom: 8px;
+  animation: slide-down 0.6s linear forwards;
+
+  @keyframes slide-down {
+    0% {
+      transform: translateY(-100%);
+    }
+    100% {
+      transform: translateY(0%);
+    }
+  }
+
+  .Searchbar {
+    height: 100%;
+  }
+
+  .favoriteButton {
+    height: 50%;
+  }
+
+  .logoRW {
+    height: 80px;
+    width: 130px;
+    animation-name: slideIn;
+    animation-duration: 2s;
+    animation-iteration-count: initial;
+  }
+
+  .logoRS {
+    height: 100%;
+    animation-name: slideIn;
+    animation-duration: 2s;
+    animation-iteration-count: initial;
+    display: flex;
+    padding-right: 10px;
+    align-items: center;
+    justify-content: center;
+
+    @keyframes slideIn {
+      // 0% {
+      //   transform: translate(-1000px, 0px);
+      // }
+      // 100% {
+      //   transform: translate(0px, 0px);
+      // }
+    }
+
+    .RS1 {
+      width: 116px;
+      height: 50px;
+      display: flex;
+      justify-content: right;
+    }
+    .RS2 {
+      width: 116px;
+      height: 50px;
+      display: flex;
+      justify-content: left;
+    }
+
+    img {
+      height: 100%;
+      padding: 5px;
+    }
+  }
+}
+
+.search-feature {
+  display: flex;
+  gap: 1em;
+  height: 3.5rem;
+}
+
+@media screen and (min-width: 2559px) {
+  .container-logo {
+    .logoRW {
+      height: 50%;
+      width: 50%;
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .navbar {
+    margin-bottom: 8px;
+
+    .search-feature {
+      padding-left: 15px;
+      margin-top: 3px;
+    }
+
+    .logoRS {
+      .RS1 {
+        width: 50%;
+        height: 50%;
+      }
+
+      .RS2 {
+        width: 50%;
+        height: 50%;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 426px) {
+  .container-logo {
+    margin-right: 10%;
+    flex: 1;
+    display: flex;
+    justify-content: right;
+
+    .logoRW {
+      height: 40%;
+      width: 40%;
+    }
+  }
+  .navbar {
+    justify-content: space-between;
+
+    .search-feature {
+      padding-left: 0px;
+      display: flex;
+      justify-content: center;
+      padding-right: 2%;
+    }
+    .logoRS {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      padding-right: 0px;
+
+      .RS1 {
+        width: 100%;
+        display: flex;
+        justify-content: right;
+        align-items: center;
+      }
+      .RS2 {
+        width: 100%;
+        display: flex;
+        justify-content: right;
+        align-items: center;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 375px) {
+  .container-logo {
+    margin-right: 10%;
+    flex: 1;
+    display: flex;
+
+    .logoRW {
+      height: 45%;
+      width: 45%;
+    }
+  }
+}

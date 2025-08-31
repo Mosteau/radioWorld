@@ -1,0 +1,29 @@
+.filter-button {
+  height: 100%;
+  display: flex;
+  padding: 0.3rem 1.5rem;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.4rem;
+  justify-content: center;
+  border-radius: 1rem;
+  background-color: var(--secondary-color);
+  border: none;
+  color: var(--neutral-color);
+  cursor: pointer; //TODO: keep this declaration for desktop version
+
+  &:hover {
+    filter: brightness(1.2);
+  }
+
+  img {
+    width: 2.4rem;
+    height: auto;
+  }
+}
+
+@media screen and (max-width: 426px) {
+  .filter-button {
+    height: 95%;
+  }
+}
