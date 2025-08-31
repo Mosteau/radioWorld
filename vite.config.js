@@ -25,14 +25,7 @@ export default defineConfig({
     terserOptions: {
       compress: {
         drop_console: true,
-        drop_debugger: true,
-        // Supprimer les commentaires en production
-        drop_comments: true
-      },
-      mangle: {
-        // Préserver les noms de classes pour le debugging
-        keep_classnames: false,
-        keep_fnames: false
+        drop_debugger: true
       }
     },
     // Taille maximale des chunks
