@@ -1,8 +1,11 @@
 import axios from "axios";
+import { validateUrl, sanitizeText, validateStationData } from "../utils/security.js";
 
-const BASE_URL = "https://de1.api.radio-browser.info/json";
-const CACHE_KEY = "radio_stations_cache";
-const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://de1.api.radio-browser.info/json";
+const CACHE_KEY = "radio_stations_cache_v2";
+const CACHE_DURATION = parseInt(import.meta.env.VITE_CACHE_DURATION) || 30 * 60 * 1000;
+const MAX_STATIONS = parseInt(import.meta.env.VITE_MAX_STATIONS) || 500;
+const REQUEST_TIMEOUT = parseInt(import.meta.env.VITE_REQUEST_TIMEOUT) || 10000;
 
 class RadioService {
   constructor() {
@@ -38,7 +41,7 @@ class RadioService {
     }
   }
 
-  async getOptimizedStations(limit = 500) {
+  async getOptimizedStations(limit = MAX_STATIONS) {
     if (this.cache) {
       return this.cache;
     }
@@ -53,6 +56,7 @@ class RadioService {
           order: "clickcount",
           reverse: true,
         },
+        timeout: REQUEST_TIMEOUT,
       });
 
       const filteredStations = this.filterValidStations(response.data, limit);
@@ -69,7 +73,6 @@ class RadioService {
     const seenNames = new Set();
     const seenUUIDs = new Set();
 
-    // Domaines connus pour avoir moins de problèmes CORS
     const corsFreeDomains = [
       "stream.radiojar.com",
       "ice.radio-canada.ca",
@@ -80,7 +83,6 @@ class RadioService {
       "stream.rcs.revma.com",
     ];
 
-    // Trier les stations : d'abord celles avec des domaines CORS-friendly
     const sortedStations = stations.sort((a, b) => {
       const urlA = a.url_resolved || a.url || "";
       const urlB = b.url_resolved || b.url || "";
@@ -102,7 +104,6 @@ class RadioService {
 
       const finalUrl = station.url_resolved || station.url;
       
-      // Validation d'URL plus stricte
       let hasValidUrl = false;
       try {
         if (finalUrl && typeof finalUrl === 'string') {
@@ -115,7 +116,6 @@ class RadioService {
         hasValidUrl = false;
       }
 
-      // Éviter les domaines connus pour avoir des problèmes CORS
       const problematicDomains = [
         "icecast.walmradio.com",
         "stream.zeno.fm",
@@ -127,13 +127,10 @@ class RadioService {
       );
 
       if (
-        station.name &&
-        station.name.trim().length > 0 &&
-        station.stationuuid &&
+        validateStationData(station) &&
         station.codec === "MP3" &&
         hasValidUrl &&
-        finalUrl &&
-        finalUrl.length > 10 && // URL minimum valide
+        validateUrl(finalUrl) &&
         !hasProblematicDomain &&
         !seenNames.has(station.name) &&
         !seenUUIDs.has(station.stationuuid)
@@ -147,9 +144,10 @@ class RadioService {
 
         validStations.push({
           ...station,
+          name: sanitizeText(station.name),
           url: finalUrl,
-          tags: station.tags || "",
-          country: station.country || "",
+          tags: sanitizeText(station.tags || ""),
+          country: sanitizeText(station.country || ""),
           corsFreindly: isCORSFriendly,
         });
       }
@@ -160,7 +158,9 @@ class RadioService {
 
   async getCountries() {
     try {
-      const response = await axios.get(`${BASE_URL}/countries`);
+      const response = await axios.get(`${BASE_URL}/countries`, {
+        timeout: REQUEST_TIMEOUT,
+      });
       return response.data;
     } catch (error) {
       console.error("Erreur lors de la récupération des pays:", error);
@@ -170,7 +170,9 @@ class RadioService {
 
   async getTags() {
     try {
-      const response = await axios.get(`${BASE_URL}/tags`);
+      const response = await axios.get(`${BASE_URL}/tags`, {
+        timeout: REQUEST_TIMEOUT,
+      });
       return response.data;
     } catch (error) {
       console.error("Erreur lors de la récupération des tags:", error);

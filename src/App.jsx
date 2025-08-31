@@ -18,12 +18,10 @@ function App() {
 
   const audioPlayer = useAudioPlayer();
 
-  // Debounce des valeurs de recherche pour éviter les recalculs fréquents
   const debouncedSearch = useDebounce(searchValue, 300);
   const debouncedStyle = useDebounce(styleSearchValue, 300);
   const debouncedCountry = useDebounce(countrySearchValue, 300);
 
-  // Filtrage optimisé avec useMemo
   const filteredRadio = useMemo(() => {
     if (!stations.length) return [];
 
@@ -42,7 +40,6 @@ function App() {
     });
   }, [stations, debouncedSearch, debouncedStyle, debouncedCountry]);
 
-  // Chargement initial des stations
   useEffect(() => {
     const loadStations = async () => {
       try {
@@ -60,7 +57,6 @@ function App() {
     loadStations();
   }, []);
 
-  // Arrêter la radio quand l'utilisateur ferme l'application
   useEffect(() => {
     const handleBeforeUnload = () => {
       audioPlayer.stop();
@@ -72,7 +68,7 @@ function App() {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       audioPlayer.stop();
     };
-  }, []); // Dépendances vides pour éviter les boucles
+  }, []);
 
   const toggleAudio = useCallback(() => {
     if (filteredRadio.length > 0 && filteredRadio[currentStationIndex]) {
