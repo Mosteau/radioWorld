@@ -18,7 +18,7 @@ function WeatherApp() {
     }
 
     const cityName = element[0].value;
-    const apiKey = "91ed1a8055b90727a16d5f8d01106413";
+    const apiKey = "";
     const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(
       cityName
     )}&units=metric&appid=${apiKey}`;
