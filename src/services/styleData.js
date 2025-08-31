@@ -1,12 +1,12 @@
-import axios from "axios";
-
-const BASE_URL = "https://de1.api.radio-browser.info/json/tags";
+import radioService from "./radioService";
 
 async function getStyleData() {
-  return axios
-    .get(BASE_URL)
-    .then((response) => response.data)
-    .catch((error) => console.error(error));
+  try {
+    return await radioService.getTags();
+  } catch (error) {
+    console.error("Erreur lors de la récupération des tags:", error);
+    return [];
+  }
 }
 
 export default getStyleData;

@@ -1,10 +1,11 @@
 /* Function pour faire fonctionner la radio (play,pause, next,previous) */
 import PropTypes from "prop-types";
 import React from "react";
+import LazyImage from "./LazyImage";
 
 function RadioPlayer({
   stations,
-  audioPlaying,
+  audioPlayer,
   currentStationIndex,
   toggleAudio,
   playNextStation,
@@ -12,6 +13,10 @@ function RadioPlayer({
   closeModal,
 }) {
   const currentStation = stations[currentStationIndex];
+
+  if (!currentStation) {
+    return null;
+  }
 
   return (
     <div type="button" className="container-radio">
@@ -23,7 +28,7 @@ function RadioPlayer({
               alt="Cassette"
               className="c1"
               style={{
-                animation: audioPlaying ? "loop 2s linear infinite" : "none",
+                animation: audioPlayer.isPlaying ? "loop 2s linear infinite" : "none",
               }}
             />
             <img
@@ -31,7 +36,7 @@ function RadioPlayer({
               alt="Cassette2"
               className="c2"
               style={{
-                animation: audioPlaying ? "loop 2s linear infinite" : "none",
+                animation: audioPlayer.isPlaying ? "loop 2s linear infinite" : "none",
               }}
             />
           </div>
@@ -55,13 +60,23 @@ function RadioPlayer({
           >
             <img src="/precedent.png" alt="precedent" />
           </div>
-          <div className="playMusic" onClick={toggleAudio} aria-hidden="true">
-            {audioPlaying ? (
+          <div 
+            className="playMusic" 
+            onClick={() => audioPlayer.toggle(currentStation.url)} 
+            aria-hidden="true"
+          >
+            {audioPlayer.isPlaying ? (
               <img src="/pause.png" alt="Pause" />
             ) : (
               <img src="/play.png" alt="Play" />
             )}
           </div>
+          {audioPlayer.isLoading && (
+            <div className="audio-loading">Chargement...</div>
+          )}
+          {audioPlayer.error && (
+            <div className="audio-error">{audioPlayer.error}</div>
+          )}
           <div
             className="nextStation"
             onClick={playNextStation}
@@ -72,7 +87,11 @@ function RadioPlayer({
         </div>
         <div className="radio-selection">
           <div className="radio-selection-favicon">
-            <img src={currentStation.favicon} alt="favicon" />
+            <LazyImage 
+              src={currentStation.favicon} 
+              alt="favicon"
+              className="favicon"
+            />
           </div>
           <p>{currentStation.name}</p>
         </div>
@@ -87,15 +106,7 @@ function RadioPlayer({
           </a>
         </div>
       </div>
-      {/* Lecteur audio caché */}
-      <audio
-        id="audioPlayer"
-        src={stations[currentStationIndex].url}
-        autoPlay={audioPlaying}
-        style={{ display: "none" }}
-      >
-        <track kind="captions" />
-      </audio>
+      {/* L'audio est maintenant géré par le hook useAudioPlayer */}
     </div>
   );
 }
@@ -106,10 +117,10 @@ RadioPlayer.propTypes = {
       url: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       favicon: PropTypes.string.isRequired,
-      homepage: PropTypes.string.isRequired,
+      homepage: PropTypes.string,
     })
   ).isRequired,
-  audioPlaying: PropTypes.bool.isRequired,
+  audioPlayer: PropTypes.object.isRequired,
   currentStationIndex: PropTypes.number.isRequired,
   toggleAudio: PropTypes.func.isRequired,
   playNextStation: PropTypes.func.isRequired,

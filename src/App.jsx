@@ -1,110 +1,109 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 import DisplayRadio from "./components/DisplayRadio";
+import radioService from "./services/radioService";
+import { useAudioPlayer } from "./hooks/useAudioPlayer";
+import { useDebounce } from "./hooks/useDebounce";
 
 function App() {
-  const [radiosRandom, setRadiosRandom] = useState([]);
-  const [audioPlaying, setAudioPlaying] = useState(false);
+  const [stations, setStations] = useState([]);
   const [currentStationIndex, setCurrentStationIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const [styleSearchValue, setStyleSearchValue] = useState("");
   const [countrySearchValue, setCountrySearchValue] = useState("");
   const [isVisible, setIsVisible] = useState(0);
-  const [filteredRadio, setFilteredRadio] = useState([]);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    setFilteredRadio(
-      radiosRandom.filter(
-        (radio) =>
-          radio.name.toLowerCase().includes(searchValue.toLowerCase()) &&
-          radio.tags.toLowerCase().includes(styleSearchValue.toLowerCase()) &&
-          radio.country.toLowerCase().includes(countrySearchValue.toLowerCase())
-      )
-    );
-  }, [radiosRandom, searchValue, styleSearchValue, countrySearchValue]);
+  const audioPlayer = useAudioPlayer();
 
+  // Debounce des valeurs de recherche pour éviter les recalculs fréquents
+  const debouncedSearch = useDebounce(searchValue, 300);
+  const debouncedStyle = useDebounce(styleSearchValue, 300);
+  const debouncedCountry = useDebounce(countrySearchValue, 300);
+
+  // Filtrage optimisé avec useMemo
+  const filteredRadio = useMemo(() => {
+    if (!stations.length) return [];
+
+    return stations.filter((radio) => {
+      const nameMatch =
+        !debouncedSearch ||
+        radio.name.toLowerCase().includes(debouncedSearch.toLowerCase());
+      const styleMatch =
+        !debouncedStyle ||
+        radio.tags.toLowerCase().includes(debouncedStyle.toLowerCase());
+      const countryMatch =
+        !debouncedCountry ||
+        radio.country.toLowerCase().includes(debouncedCountry.toLowerCase());
+
+      return nameMatch && styleMatch && countryMatch;
+    });
+  }, [stations, debouncedSearch, debouncedStyle, debouncedCountry]);
+
+  // Chargement initial des stations
   useEffect(() => {
-    axios
-      .get("https://de1.api.radio-browser.info/json/stations?limit=8000")
-      .then((res) => {
-        const tabRadios = [];
-        for (let i = 0; i < 500; i += 1) {
-          const randomRadio =
-            res.data[Math.floor(Math.random() * res.data.length)];
-          if (
-            randomRadio.favicon !== "" &&
-            randomRadio.name !== "" &&
-            randomRadio.stationuuid !== "" &&
-            randomRadio.tags !== "" &&
-            randomRadio.country !== "" &&
-            randomRadio.codec === "MP3" &&
-            randomRadio.url.includes("https") === true
-          ) {
-            const verifName = randomRadio.name;
-            const verifUUID = randomRadio.stationuuid;
-            if (
-              !tabRadios.find(({ stationuuid }) => stationuuid === verifUUID) &&
-              !tabRadios.find(({ name }) => name === verifName)
-            ) {
-              tabRadios.push(randomRadio);
-            } else {
-              i -= 1;
-            }
-          } else {
-            i -= 1;
-          }
-        }
-        setRadiosRandom(tabRadios);
-        setFilteredRadio(tabRadios);
+    const loadStations = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const stationsData = await radioService.getOptimizedStations();
+        setStations(stationsData);
+      } catch (err) {
+        setError("Erreur lors du chargement des stations");
+      } finally {
         setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error(
-          "Erreur lors de la récupération des données de l'API.",
-          error
-        );
-        setIsLoading(false);
-      });
+      }
+    };
+
+    loadStations();
   }, []);
 
-  const toggleAudio = () => {
-    setAudioPlaying(!audioPlaying);
-  };
-
-  const playNextStation = () => {
-    if (currentStationIndex < filteredRadio.length - 1) {
-      setCurrentStationIndex(currentStationIndex + 1);
-    } else {
-      setCurrentStationIndex(0);
-    }
-    setAudioPlaying(true);
-  };
-
-  const playPreviousStation = () => {
-    if (currentStationIndex > 0) {
-      setCurrentStationIndex(currentStationIndex - 1);
-    } else {
-      setCurrentStationIndex(filteredRadio.length - 1);
-    }
-    setAudioPlaying(true);
-  };
-
+  // Arrêter la radio quand l'utilisateur ferme l'application
   useEffect(() => {
-    const audioElement = document.getElementById("audioPlayer");
-    if (audioElement) {
-      audioElement.src = filteredRadio[currentStationIndex].url;
-      audioElement.addEventListener("canplay", () => {
-        if (audioPlaying) {
-          audioElement.play();
-        } else {
-          audioElement.pause();
-        }
-      });
+    const handleBeforeUnload = () => {
+      audioPlayer.stop();
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      audioPlayer.stop();
+    };
+  }, []); // Dépendances vides pour éviter les boucles
+
+  const toggleAudio = useCallback(() => {
+    if (filteredRadio.length > 0 && filteredRadio[currentStationIndex]) {
+      const station = filteredRadio[currentStationIndex];
+      audioPlayer.toggle(station.url);
     }
-  }, [currentStationIndex, audioPlaying]);
+  }, [audioPlayer, filteredRadio, currentStationIndex]);
+
+  const playNextStation = useCallback(() => {
+    if (filteredRadio.length === 0) return;
+
+    const nextIndex =
+      currentStationIndex < filteredRadio.length - 1
+        ? currentStationIndex + 1
+        : 0;
+
+    setCurrentStationIndex(nextIndex);
+    audioPlayer.play(filteredRadio[nextIndex].url);
+  }, [currentStationIndex, filteredRadio, audioPlayer]);
+
+  const playPreviousStation = useCallback(() => {
+    if (filteredRadio.length === 0) return;
+
+    const prevIndex =
+      currentStationIndex > 0
+        ? currentStationIndex - 1
+        : filteredRadio.length - 1;
+
+    setCurrentStationIndex(prevIndex);
+    audioPlayer.play(filteredRadio[prevIndex].url);
+  }, [currentStationIndex, filteredRadio, audioPlayer]);
 
   return (
     <div className="main">
@@ -120,12 +119,17 @@ function App() {
           <img src="/Radio_World.png" alt="logo" className="loadingLogo" />
         </div>
       )}
+      {error && (
+        <div className="error-message">
+          <p>{error}</p>
+        </div>
+      )}
+
       <div>
         <DisplayRadio
-          radiosRandom={radiosRandom}
           filteredRadio={filteredRadio}
           toggleAudio={toggleAudio}
-          audioPlaying={audioPlaying}
+          audioPlayer={audioPlayer}
           currentStationIndex={currentStationIndex}
           playPreviousStation={playPreviousStation}
           playNextStation={playNextStation}

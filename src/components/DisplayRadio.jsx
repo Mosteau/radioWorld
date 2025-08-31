@@ -1,14 +1,14 @@
 /* eslint-disable react/prop-types */
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import RadioPlayer from "./RadioPlayer";
 import FilterSection from "./FilterSection";
-// import Favorite from "./Favorite";
+import LazyImage from "./LazyImage";
 
 function DisplayRadio({
   filteredRadio,
   toggleAudio,
-  audioPlaying,
+  audioPlayer,
   playNextStation,
   playPreviousStation,
   currentStationIndex,
@@ -24,6 +24,17 @@ function DisplayRadio({
   setIsVisible,
 }) {
   const [openModal, setOpenModal] = useState(false);
+
+  const handleStationClick = useCallback((selectedIndex) => {
+    setCurrentStationIndex(selectedIndex);
+    setOpenModal(true);
+    
+    // Démarrer l'audio automatiquement
+    if (filteredRadio[selectedIndex]) {
+      const station = filteredRadio[selectedIndex];
+      audioPlayer.play(station.url);
+    }
+  }, [setCurrentStationIndex, filteredRadio, audioPlayer]);
   return (
     <div className="container-display-radio">
       <FilterSection
@@ -40,37 +51,31 @@ function DisplayRadio({
         {filteredRadio.length === 0 ? (
           <p className="no-results">No results found</p>
         ) : (
-          filteredRadio &&
-          filteredRadio.map((station, selectedCurrentStationIndex) => {
-            return (
-              <div className="space4" key={station.stationuuid}>
-                <div className="rond">
-                  <button
-                    onClick={() => {
-                      setOpenModal(true);
-                      setCurrentStationIndex(selectedCurrentStationIndex);
-                    }}
-                    type="button"
-                    className="radio"
-                  >
-                    <img
-                      src={station.favicon}
-                      alt="favicon"
-                      className="favicon"
-                    />
-                    <p>{station.name}</p>
-                  </button>
-                </div>
+          filteredRadio.map((station, selectedCurrentStationIndex) => (
+            <div className="space4" key={station.stationuuid}>
+              <div className="rond">
+                <button
+                  onClick={() => handleStationClick(selectedCurrentStationIndex)}
+                  type="button"
+                  className="radio"
+                >
+                  <LazyImage
+                    src={station.favicon}
+                    alt="favicon"
+                    className="favicon"
+                  />
+                  <p>{station.name}</p>
+                </button>
               </div>
-            );
-          })
+            </div>
+          ))
         )}
       </div>
       {filteredRadio.length > 0 && openModal && (
         <RadioPlayer
           closeModal={setOpenModal}
           stations={filteredRadio}
-          audioPlaying={audioPlaying}
+          audioPlayer={audioPlayer}
           currentStationIndex={currentStationIndex}
           toggleAudio={toggleAudio}
           playNextStation={playNextStation}
@@ -82,7 +87,8 @@ function DisplayRadio({
 }
 
 DisplayRadio.propTypes = {
-  audioPlaying: PropTypes.bool.isRequired,
+  filteredRadio: PropTypes.array.isRequired,
+  audioPlayer: PropTypes.object.isRequired,
   currentStationIndex: PropTypes.number.isRequired,
   toggleAudio: PropTypes.func.isRequired,
   playNextStation: PropTypes.func.isRequired,

@@ -1,26 +1,31 @@
 .container-search-bar {
+  width: 100%;
   height: 100%;
   display: flex;
   justify-content: center;
+  align-items: center;
   position: relative;
-  top: 0;
 }
 
-.container-search-bar .search-bar {
+.search-bar {
+  width: 100%;
   height: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .search-bar__input {
-  height: 100%;
+  width: 100%;
+  height: 40px;
   background-color: #fae7a7;
-  flex: 1;
-  display: flex;
   padding: 0.5rem 1rem;
   border-radius: 1rem;
   border: 1px solid var(--secondary-color);
-  width: 500px;
+  font-size: 14px;
   animation: slide-down 0.6s linear forwards;
   transform: translateY(-200%);
+  box-sizing: border-box;
+  transition: all 0.3s ease;
 
   @keyframes slide-down {
     0% {
@@ -35,32 +40,95 @@
       opacity: 1;
     }
   }
+
+  &:focus {
+    outline: none;
+    border-color: var(--secondary-color-fade-1);
+    box-shadow: 0 0 0 2px rgba(165, 30%, 40%, 0.2);
+  }
+
+  &::placeholder {
+    color: #666;
+    font-size: 14px;
+  }
 }
 
-.search-bar__input:focus {
-  outline: none;
-}
-
-@media screen and (max-width: 768px) {
-  .container-search-bar {
-    width: 35vw;
-    height: 5vh;
-    justify-content: left;
-    padding-left: 5px;
-
-    .search-bar__input {
-      width: 140%;
+// Large screens
+@media screen and (min-width: 1200px) {
+  .search-bar__input {
+    height: 45px;
+    font-size: 16px;
+    
+    &::placeholder {
+      font-size: 16px;
     }
   }
 }
 
-@media screen and (max-width: 426px) {
-  .container-search-bar {
-    padding-left: 0px;
-    width: 75%;
-    display: none;
-    .search-bar__input {
-      height: 80%;
+// Tablets and small laptops
+@media screen and (max-width: 1024px) {
+  .search-bar__input {
+    height: 38px;
+    font-size: 14px;
+    padding: 0.4rem 0.8rem;
+    
+    &::placeholder {
+      font-size: 14px;
+    }
+  }
+}
+
+// Tablets portrait
+@media screen and (max-width: 768px) {
+  .search-bar__input {
+    height: 36px;
+    font-size: 13px;
+    padding: 0.3rem 0.7rem;
+    
+    &::placeholder {
+      font-size: 13px;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+// Mobile landscape
+@media screen and (max-width: 640px) {
+  .search-bar__input {
+    height: 34px;
+    font-size: 12px;
+    padding: 0.25rem 0.6rem;
+    
+    &::placeholder {
+      content: "Search radio...";
+      font-size: 12px;
+    }
+  }
+}
+
+// Mobile portrait
+@media screen and (max-width: 480px) {
+  .search-bar__input {
+    height: 32px;
+    font-size: 12px;
+    padding: 0.25rem 0.5rem;
+    
+    &::placeholder {
+      content: "Search...";
+      font-size: 12px;
+    }
+  }
+}
+
+// Very small screens
+@media screen and (max-width: 320px) {
+  .search-bar__input {
+    height: 30px;
+    font-size: 11px;
+    padding: 0.2rem 0.4rem;
+    
+    &::placeholder {
+      font-size: 11px;
     }
   }
 }
