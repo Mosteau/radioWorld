@@ -20,14 +20,8 @@ export default defineConfig({
         }
       }
     },
-    // Compression et optimisation
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true
-      }
-    },
+    // Compression et optimisation avec esbuild (plus rapide et stable)
+    minify: 'esbuild',
     // Taille maximale des chunks
     chunkSizeWarningLimit: 1000,
     // Optimisation des assets
